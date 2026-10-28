@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>LantRne</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout : barre latérale « nuit » à gauche, la lanterne (ambre) éclaire l'essentiel ; contenu clair, dense, lisible. */
+:root{
+  --bg:#F3F4F8; --surface:#FFFFFF; --surface-2:#ECEFF5; --ink:#162034; --ink-2:#505A6E; --ink-3:#7A8397;
+  --line:#DCE0EA; --night:#141E36; --night-2:#1E2A47; --night-ink:#E6EAF4; --night-ink-2:#9AA5C0;
+  --flame:#E9A23B; --flame-soft:#FBEBCF; --flame-ink:#7A4800; --link:#294C8E; --link-soft:#E3EAF7;
+  --ok:#24734F; --ok-soft:#DDF0E6; --warn:#9A5B00; --warn-soft:#FBEBD2; --crit:#B0352E; --crit-soft:#F8E0DE;
+  --lit-vert:#3C8A4E; --lit-violet:#6B3FA0; --lit-blanc:#F4EEDB; --lit-rouge:#B8322C; --lit-rose:#D98AA6;
+  --shadow:0 1px 2px rgba(20,30,54,.06),0 4px 16px rgba(20,30,54,.05);
+  --f-display:"Spectral",Georgia,"Times New Roman",serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1424; --surface:#161F35; --surface-2:#1D2741; --ink:#E7EAF2; --ink-2:#A6AEC1; --ink-3:#7E879C;
+  --line:#2A3551; --night:#0A0F1E; --night-2:#151E35; --night-ink:#E6EAF4; --night-ink-2:#8F9AB5;
+  --flame:#F0B252; --flame-soft:#3A2C14; --flame-ink:#F4C57A; --link:#93B2EE; --link-soft:#1F2C4A;
+  --ok:#5CC79A; --ok-soft:#163327; --warn:#E9AA50; --warn-soft:#382A13; --crit:#EE7B72; --crit-soft:#3A1C1B;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0E1424; --surface:#161F35; --surface-2:#1D2741; --ink:#E7EAF2; --ink-2:#A6AEC1; --ink-3:#7E879C;
+  --line:#2A3551; --night:#0A0F1E; --night-2:#151E35; --night-ink:#E6EAF4; --night-ink-2:#8F9AB5;
+  --flame:#F0B252; --flame-soft:#3A2C14; --flame-ink:#F4C57A; --link:#93B2EE; --link-soft:#1F2C4A;
+  --ok:#5CC79A; --ok-soft:#163327; --warn:#E9AA50; --warn-soft:#382A13; --crit:#EE7B72; --crit-soft:#3A1C1B;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--link)}
+:focus-visible{outline:2px solid var(--flame);outline-offset:2px;border-radius:4px}
+
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100%}
+.side{background:var(--night);color:var(--night-ink);display:flex;flex-direction:column;gap:20px;
+  padding-block:22px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:16px;position:sticky;top:0;height:100vh;height:100dvh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px}
+.brand svg{flex:none}
+.word{font-family:var(--f-display);font-size:25px;font-weight:600;letter-spacing:.01em}
+.word b{color:var(--flame);font-weight:700}
+.place{padding:10px 10px;border-radius:10px;background:var(--night-2);font-size:13px;line-height:1.35}
+.place strong{display:block;font-weight:600}
+.place span{color:var(--night-ink-2)}
+nav.menu{display:flex;flex-direction:column;gap:2px}
+nav.menu a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--night-ink-2);text-decoration:none;font-weight:500;white-space:nowrap}
+nav.menu a:hover{color:var(--night-ink);background:var(--night-2)}
+nav.menu a[aria-current="page"]{color:var(--night-ink);background:var(--night-2);box-shadow:inset 3px 0 0 var(--flame)}
+nav.menu svg{width:18px;height:18px;flex:none}
+.side-foot{margin-top:auto;font-size:12px;color:var(--night-ink-2);padding:0 6px}
+
+main{min-width:0;padding-block:28px 60px;padding-left:max(16px,min(4vw,40px));padding-right:max(16px,env(safe-area-inset-right,0px),min(4vw,40px))}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-weight:600;font-size:30px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:600;font-size:19px;margin:0}
+.sub{color:var(--ink-2);margin:4px 0 0}
+.eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g32{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+@media (max-width:1060px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.g2,.g32{grid-template-columns:minmax(0,1fr)}}
+
+.stat .k{font-size:13px;color:var(--ink-2)}
+.stat .v{font-family:var(--f-display);font-size:28px;font-weight:600;line-height:1.2;margin-top:2px}
+.stat .n{font-size:13px;color:var(--ink-3);margin-top:4px}
+.bar{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--flame);border-radius:99px}
+.bar.blue i{background:var(--link)}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--night);color:var(--night-ink);border-color:var(--night)}
+.btn.primary:hover{background:var(--night-2)}
+.btn.small{padding:5px 10px;font-size:13px}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--link)}
+.btn.ghost:hover{background:var(--link-soft)}
+.btn:disabled{opacity:.5;cursor:default}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.crit{background:var(--crit-soft);color:var(--crit)}
+.chip.flame{background:var(--flame-soft);color:var(--flame-ink)}
+.chip.blue{background:var(--link-soft);color:var(--link)}
+
+.swatch{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.18);vertical-align:-2px;flex:none}
+
+/* Bandeau liturgique */
+.liturgy{display:flex;gap:18px;align-items:stretch;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.liturgy .stole{width:10px;flex:none}
+.liturgy .body{padding:16px 18px 16px 4px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;flex:1;min-width:0}
+.liturgy .today{flex:1 1 320px;min-width:0}
+.liturgy .feast{font-family:var(--f-display);font-size:22px;font-weight:600;line-height:1.25;margin-top:2px}
+.liturgy .meta{color:var(--ink-2);font-size:14px;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.liturgy .next{flex:0 1 300px;min-width:0;font-size:14px;border-left:1px solid var(--line);padding-left:20px}
+@media (max-width:700px){.liturgy .next{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:12px;flex-basis:100%}}
+
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0;padding-top:2px}
+.row .main{flex:1;min-width:0}
+.row .t{font-weight:600}
+.row .s{color:var(--ink-2);font-size:13px}
+.datebox{width:46px;flex:none;text-align:center;border:1px solid var(--line);border-radius:8px;padding:3px 0;line-height:1.1}
+.datebox b{display:block;font-family:var(--f-display);font-size:19px}
+.datebox span{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+
+.tablewrap{overflow-x:auto;margin:0 -18px;padding:0 18px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover td{background:var(--surface-2)}
+.muted{color:var(--ink-3)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.input,select.input{padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0}
+.input:focus{outline:2px solid var(--flame);outline-offset:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);padding:7px 12px;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--night);color:var(--night-ink)}
+
+/* Planning */
+.roster{display:grid;grid-template-columns:minmax(140px,1.1fr) repeat(var(--cols),minmax(150px,1fr));min-width:560px}
+.roster > div{padding:10px;border-bottom:1px solid var(--line)}
+.roster .rh{font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.roster .role{font-weight:600}
+.roster .role small{display:block;font-weight:400;color:var(--ink-3);font-size:12px}
+.slot{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.slot .who{font-size:13.5px;display:flex;align-items:center;gap:6px}
+.slot .empty{border:1px dashed var(--crit);color:var(--crit);background:var(--crit-soft);border-radius:6px;padding:3px 8px;font-size:12.5px;font-weight:600;cursor:pointer}
+.slot .empty:hover{filter:brightness(.97)}
+.av{width:22px;height:22px;border-radius:50%;background:var(--link-soft);color:var(--link);font-size:10.5px;font-weight:700;display:grid;place-items:center;flex:none}
+
+/* Parcours */
+.kanban{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:12px;min-width:880px}
+.col{background:var(--surface-2);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.col h3{margin:2px 4px 4px;font-size:13px;font-weight:700;display:flex;justify-content:space-between}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.card .t{font-weight:600}
+.card .s{font-size:13px;color:var(--ink-2)}
+
+/* Fiche / tiroir / fenêtres */
+.scrim{position:fixed;inset:0;background:rgba(10,15,30,.45);z-index:40;display:flex;justify-content:flex-end}
+.scrim.center{justify-content:center;align-items:flex-start;padding:max(24px,env(safe-area-inset-top,0px)) 16px 24px;overflow-y:auto}
+.drawer{width:min(520px,100%);height:100%;background:var(--surface);overflow-y:auto;padding:22px max(20px,env(safe-area-inset-right,0px)) 40px 22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+.modal{width:min(560px,100%);background:var(--surface);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow)}
+.modal.wide{width:min(760px,100%)}
+.modal-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.x{border:0;background:transparent;cursor:pointer;font-size:22px;line-height:1;color:var(--ink-3);padding:2px 6px;border-radius:6px}
+.x:hover{background:var(--surface-2)}
+form.f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+form.f label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--ink-2)}
+form.f label.full{grid-column:1/-1}
+form.f .actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+@media (max-width:520px){form.f{grid-template-columns:minmax(0,1fr)}}
+.check{flex-direction:row!important;align-items:center;gap:8px!important;font-weight:500!important}
+.kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;font-size:14px}
+.kv dt{color:var(--ink-3)}
+.kv dd{margin:0;user-select:all;overflow-wrap:anywhere}
+.note{background:var(--flame-soft);color:var(--flame-ink);border-radius:8px;padding:10px 12px;font-size:13.5px}
+.confid{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+
+/* Reçu fiscal */
+.receipt{border:1px solid var(--ink-3);border-radius:4px;padding:18px;font-size:13px;display:flex;flex-direction:column;gap:12px;background:var(--surface)}
+.receipt .rt{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px}
+.receipt .rt b{font-family:var(--f-display);font-size:17px}
+.receipt h4{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.receipt .big{font-family:var(--f-display);font-size:22px;font-weight:600}
+.boxes{display:flex;flex-wrap:wrap;gap:6px 16px}
+.boxes span::before{content:"☐ ";color:var(--ink-3)}
+.boxes span.on::before{content:"☒ ";color:var(--ink)}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--night);color:var(--night-ink);padding:10px 16px;border-radius:10px;z-index:60;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.trad{display:flex;flex-direction:column;gap:8px}
+.trad.active{border-color:var(--flame);box-shadow:inset 0 0 0 1px var(--flame)}
+.trad ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:13.5px}
+svg.chart text{fill:var(--ink-3);font-size:11px;font-family:var(--f-body)}
+
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:sticky;top:0;height:auto;z-index:20;padding-block:10px;gap:10px;padding-right:max(16px,env(safe-area-inset-right,0px));top:env(safe-area-inset-top,0px)}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--night)}
+  .place,.side-foot{display:none}
+  .brand .word{font-size:21px}
+  nav.menu{flex-direction:row;overflow-x:auto;gap:4px;margin:0 -4px;padding-bottom:2px}
+  nav.menu a{padding:7px 10px;font-size:14px}
+  nav.menu a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--flame)}
+  nav.menu svg{display:none}
+  h1{font-size:25px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg width="30" height="34" viewBox="0 0 30 34" aria-hidden="true">
+        <path d="M11 3h8M15 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M8 7h14l2 3v17l-2 3H8l-2-3V10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M15 13c2.6 2.6 3.4 5 2.4 7.3-.6 1.4-1.7 2.2-2.4 2.2s-1.8-.8-2.4-2.2c-1-2.3-.2-4.7 2.4-7.3z" fill="var(--flame)"/>
+        <path d="M6 33h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="word">Lant<b>R</b>ne</span>
+    </div>
+    <div class="place"><strong id="placeName">Paroisse Notre-Dame-des-Sources</strong><span id="placeSub">Association cultuelle · 2 lieux de culte</span></div>
+    <nav class="menu" id="menu"></nav>
+    <div class="side-foot">Prototype · données fictives, réinitialisées à chaque ouverture</div>
+  </aside>
+  <main><div class="wrap" id="view"></div></main>
+</div>
+<div id="layer"></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- Outils ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const DAY = 864e5;
+const sod = d => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+const add = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const same = (a,b) => a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+const TODAY = sod(new Date());
+const d = n => add(TODAY, n);
+const iso = x => `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;
+const parse = s => { const [y,m,dd] = s.split("-").map(Number); return new Date(y,m-1,dd); };
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const MCOURT = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const JOURS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const fdate = x => `${x.getDate()===1?"1er":x.getDate()} ${MOIS[x.getMonth()]} ${x.getFullYear()}`;
+const fdateLong = x => `${cap(JOURS[x.getDay()])} ${x.getDate()===1?"1er":x.getDate()} ${MOIS[x.getMonth()]}`;
+const fshort = x => `${x.getDate()} ${MCOURT[x.getMonth()]}`;
+const eur = (n,dec) => n.toLocaleString("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:dec?2:0,minimumFractionDigits:dec?2:0});
+const initials = n => n.split(/\s+/).map(p=>p[0]).slice(0,2).join("").toUpperCase();
+let seed = 20261028; const rnd = () => (seed = (seed*1103515245+12345) % 2147483648) / 2147483648;
+const pick = a => a[Math.floor(rnd()*a.length)];
+const uid = (p) => p + Math.random().toString(36).slice(2,8);
+
+/* ---------- Montant en lettres ---------- */
+const U = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];
+const T = ["","","vingt","trente","quarante","cinquante","soixante"];
+function b100(n){
+  if(n<17) return U[n];
+  if(n<20) return "dix-"+U[n-10];
+  const t = Math.floor(n/10), u = n%10;
+  if(t===7){ return n===71 ? "soixante et onze" : "soixante-"+b100(n-60); }
+  if(t===9){ return "quatre-vingt-"+b100(n-80); }
+  if(t===8){ return u===0 ? "quatre-vingts" : "quatre-vingt-"+U[u]; }
+  if(u===0) return T[t];
+  if(u===1) return T[t]+" et un";
+  return T[t]+"-"+U[u];
+}
+function b1000(n){
+  const h = Math.floor(n/100), r = n%100;
+  if(h===0) return b100(r);
+  const p = h===1 ? "cent" : U[h]+" cent";
+  if(r===0) return h>1 ? p+"s" : p;
+  return p+" "+b100(r);
+}
+function lettres(n){
+  if(n===0) return "zéro";
+  const th = Math.floor(n/1000), r = n%1000;
+  let s = "";
+  if(th) s = th===1 ? "mille" : b1000(th).replace(/(vingt|cent)s$/,"$1")+" mille";
+  if(r) s += (s?" ":"")+b1000(r);
+  return s;
+}
+function enLettres(m){
+  const e = Math.floor(m), c = Math.round((m-e)*100);
+  let s = lettres(e)+(e>1?" euros":" euro");
+  if(c) s += " et "+lettres(c)+(c>1?" centimes":" centime");
+  return s;
+}
+
+/* ---------- Calendrier liturgique (rite romain, France) ---------- */
+function paques(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,dd=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),
+  h=(19*a+b-dd-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+  mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1; return new Date(y,mo-1,da);
+}
+function avent1(y){ const n = new Date(y,11,25); const w = n.getDay(); return add(n, -(w===0?28:w+21)); }
+const FIXES = {
+ "01-01":["Sainte Marie, Mère de Dieu","blanc","S"],"02-02":["Présentation du Seigneur","blanc","F"],
+ "03-19":["Saint Joseph","blanc","S"],"03-25":["Annonciation du Seigneur","blanc","S"],
+ "06-24":["Nativité de saint Jean-Baptiste","blanc","S"],"06-29":["Saints Pierre et Paul","rouge","S"],
+ "07-22":["Sainte Marie-Madeleine","blanc","F"],"08-06":["Transfiguration du Seigneur","blanc","F"],
+ "08-10":["Saint Laurent","rouge","F"],"08-15":["Assomption de la Vierge Marie","blanc","S"],
+ "09-14":["La Croix glorieuse","rouge","F"],"09-29":["Saints Michel, Gabriel et Raphaël","blanc","F"],
+ "10-18":["Saint Luc, évangéliste","rouge","F"],"10-28":["Saints Simon et Jude, apôtres","rouge","F"],
+ "11-01":["Toussaint","blanc","S"],"11-02":["Commémoration de tous les fidèles défunts","violet","S"],
+ "11-11":["Saint Martin de Tours","blanc","F"],"11-30":["Saint André, apôtre","rouge","F"],
+ "12-08":["Immaculée Conception","blanc","S"],"12-25":["Nativité du Seigneur","blanc","S"],
+ "12-26":["Saint Étienne","rouge","F"],"12-27":["Saint Jean, apôtre","blanc","F"],"12-28":["Saints Innocents","rouge","F"]
+};
+const ord = n => n===1 ? "1er" : n+"e";
+function liturgie(x){
+  x = sod(x); const y = x.getFullYear(), dow = x.getDay(), sun = dow===0;
+  const P = paques(y), cendres = add(P,-46), rameaux = add(P,-7), pente = add(P,49);
+  const A = avent1(y), roi = add(A,-7), ep = (()=>{ for(let i=2;i<=8;i++){ const t=new Date(y,0,i); if(t.getDay()===0) return t; } })();
+  const bapt = ep.getDate()>=7 ? add(ep,1) : add(ep,7);
+  const diff = (a,b)=>Math.round((sod(a)-sod(b))/DAY);
+  let temps, couleur;
+  if(x>=A && x<new Date(y,11,25)) { temps="Temps de l'Avent"; couleur="violet"; }
+  else if(x>=new Date(y,11,25) || x<=bapt) { temps="Temps de Noël"; couleur="blanc"; }
+  else if(x>=cendres && x<rameaux) { temps="Carême"; couleur="violet"; }
+  else if(x>=rameaux && x<P) { temps="Semaine sainte"; couleur="violet"; }
+  else if(x>=P && x<=pente) { temps="Temps pascal"; couleur="blanc"; }
+  else { temps="Temps ordinaire"; couleur="vert"; }
+  const R = (nom,c,rang) => ({nom, couleur:c||couleur, temps, rang:rang||"S"});
+  // Jours mobiles
+  if(same(x,P)) return R("Dimanche de Pâques","blanc");
+  if(same(x,rameaux)) return R("Dimanche des Rameaux et de la Passion","rouge");
+  if(same(x,add(P,-3))) return R("Jeudi saint","blanc");
+  if(same(x,add(P,-2))) return R("Vendredi saint","rouge");
+  if(same(x,add(P,-1))) return R("Samedi saint","violet");
+  if(same(x,cendres)) return R("Mercredi des Cendres","violet");
+  if(same(x,add(P,39))) return R("Ascension du Seigneur","blanc");
+  if(same(x,pente)) return R("Pentecôte","rouge");
+  if(same(x,add(pente,7))) return R("Sainte Trinité","blanc");
+  if(same(x,add(pente,14))) return R("Saint-Sacrement","blanc");
+  if(same(x,add(pente,19))) return R("Sacré-Cœur de Jésus","blanc");
+  if(same(x,roi)) return R("Christ, Roi de l'univers","blanc");
+  if(same(x,ep)) return R("Épiphanie du Seigneur","blanc");
+  if(same(x,bapt)) return R("Baptême du Seigneur","blanc");
+  const key = String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
+  const fx = FIXES[key];
+  const fort = temps!=="Temps ordinaire" && temps!=="Temps de Noël";
+  if(fx && (!sun || (fx[2]==="S" && !fort))) return R(fx[0],fx[1],fx[2]);
+  if(sun){
+    if(temps==="Temps de l'Avent"){ const k=Math.floor(diff(x,A)/7)+1; return R(ord(k)+" dimanche de l'Avent", k===3?"rose":"violet"); }
+    if(temps==="Carême"){ const k=Math.floor(diff(x,add(cendres,4))/7)+1; return R(ord(k)+" dimanche de Carême", k===4?"rose":"violet"); }
+    if(temps==="Temps pascal"){ const k=Math.floor(diff(x,P)/7)+1; return R(ord(k)+" dimanche de Pâques","blanc"); }
+    if(temps==="Temps de Noël") return R("Dimanche du temps de Noël","blanc");
+    return R("Dimanche du Temps ordinaire","vert");
+  }
+  return {nom:"Férie · "+temps, couleur, temps, rang:"f"};
+}
+const LITCOL = {vert:"var(--lit-vert)",violet:"var(--lit-violet)",blanc:"var(--lit-blanc)",rouge:"var(--lit-rouge)",rose:"var(--lit-rose)"};
+
+/* ---------- Données de démonstration ---------- */
+const S = {};
+const nextSun = add(TODAY,(7-TODAY.getDay())%7);
+S.reglages = { nom:"Paroisse Notre-Dame-des-Sources", statut:"cultuelle", objectifDenier:48000, offrande:18, seuilEtranger:15300, campagne:{nom:"Réfection de la toiture de Notre-Dame", objectif:120000} };
+S.foyers = [
+ {id:"f1",nom:"Famille Martin",adresse:"12 rue des Tilleuls",ville:"Saint-Aubin",email:"claire.martin@exemple.fr",tel:"06 12 34 56 78",depuis:2011,
+  membres:[{p:"Pierre Martin",r:"Adulte",sac:"Baptême, Confirmation, Mariage"},{p:"Claire Martin",r:"Adulte",sac:"Baptême, Confirmation, Mariage"},{p:"Léa Martin",r:"Enfant, 9 ans",sac:"Baptême · catéchisme CE2"}],
+  note:"Pierre coordonne l'équipe d'accueil depuis 2023."},
+ {id:"f2",nom:"Famille Nguyen",adresse:"4 impasse du Moulin",ville:"Saint-Aubin",email:"thao.nguyen@exemple.fr",tel:"06 22 41 07 93",depuis:2019,
+  membres:[{p:"Thao Nguyen",r:"Adulte",sac:"Baptême, Mariage"},{p:"Minh Nguyen",r:"Adulte",sac:"Baptême, Mariage"},{p:"Gabriel Nguyen",r:"Nourrisson",sac:"Baptême en préparation"}],note:""},
+ {id:"f3",nom:"Mme Odette Leroy",adresse:"7 place de l'Église",ville:"Saint-Aubin",email:"",tel:"05 49 11 22 33",depuis:1968,
+  membres:[{p:"Odette Leroy",r:"Adulte, 82 ans",sac:"Baptême, Confirmation, Mariage"}],note:"Veuve depuis mars. Souhaite une visite mensuelle et la communion à domicile."},
+ {id:"f4",nom:"Famille Rousseau",adresse:"22 chemin des Vignes",ville:"Montreuil-le-Val",email:"m.rousseau@exemple.fr",tel:"06 71 90 12 45",depuis:1976,
+  membres:[{p:"Michel Rousseau",r:"Adulte",sac:"Baptême, Confirmation, Mariage"},{p:"Anne Rousseau",r:"Adulte",sac:"Baptême, Confirmation, Mariage"}],note:"Noces d'or célébrées cette année."},
+ {id:"f5",nom:"Famille Moreau",adresse:"3 allée des Acacias",ville:"Saint-Aubin",email:"famille.moreau@exemple.fr",tel:"06 30 55 81 02",depuis:2008,
+  membres:[{p:"Sophie Moreau",r:"Adulte",sac:"Baptême, Confirmation"},{p:"Julie Moreau",r:"Adulte, 27 ans",sac:"Baptême, Confirmation · mariage en préparation"}],note:""},
+ {id:"f6",nom:"Famille Kouassi",adresse:"18 rue Victor-Hugo",ville:"Montreuil-le-Val",email:"kouassi.e@exemple.fr",tel:"07 68 23 44 10",depuis:2021,
+  membres:[{p:"Emmanuel Kouassi",r:"Adulte",sac:"Baptême, Confirmation, Mariage"},{p:"Grâce Kouassi",r:"Adulte",sac:"Baptême, Confirmation, Mariage"},{p:"Inès Kouassi",r:"Enfant, 4 ans",sac:"Baptême en préparation"}],note:"Grâce anime la chorale des familles."},
+ {id:"f7",nom:"M. Antoine Dubreuil",adresse:"9 bis rue du Lavoir",ville:"Saint-Aubin",email:"a.dubreuil@exemple.fr",tel:"06 48 09 77 31",depuis:2025,
+  membres:[{p:"Antoine Dubreuil",r:"Adulte, 34 ans",sac:"Baptême · confirmation en préparation"}],note:"Arrivé l'an dernier, a demandé à rejoindre un groupe de partage."},
+ {id:"f8",nom:"Famille Lefèvre",adresse:"31 avenue de la Gare",ville:"Saint-Aubin",email:"lefevre.paul@exemple.fr",tel:"06 01 98 65 43",depuis:2002,
+  membres:[{p:"Paul Lefèvre",r:"Adulte",sac:"Baptême, Confirmation, Mariage"},{p:"Hélène Lefèvre",r:"Adulte",sac:"Baptême, Confirmation, Mariage"}],note:""},
+ {id:"f9",nom:"Mme Isabelle Garnier",adresse:"2 rue de la Fontaine",ville:"Montreuil-le-Val",email:"i.garnier@exemple.fr",tel:"06 55 12 70 88",depuis:1999,
+  membres:[{p:"Isabelle Garnier",r:"Adulte",sac:"Baptême, Confirmation"}],note:"Responsable du fleurissement."},
+ {id:"f10",nom:"Famille Benali-Durand",adresse:"15 rue des Écoles",ville:"Saint-Aubin",email:"benali.durand@exemple.fr",tel:"06 87 44 21 09",depuis:2017,
+  membres:[{p:"Karim Benali",r:"Adulte",sac:"Baptême (adulte), Confirmation, Mariage"},{p:"Marion Durand",r:"Adulte",sac:"Baptême, Confirmation, Mariage"}],note:""}
+];
+const FONDS = ["Denier","Quête","Travaux","Casuel","Intention de messe"];
+const MODES = ["Prélèvement","Carte bancaire","Chèque","Virement","Espèces"];
+S.dons = [];
+(function gen(){
+  const denierMensuel = {f1:30,f4:50,f8:40,f10:25};
+  const y0 = new Date(TODAY.getFullYear(),0,1);
+  for(let m=0;m<=TODAY.getMonth();m++){
+    for(const [fid,mt] of Object.entries(denierMensuel)){
+      const dt = new Date(TODAY.getFullYear(),m,5); if(dt>TODAY) continue;
+      S.dons.push({id:uid("d"),date:iso(dt),foyer:fid,montant:mt,fonds:"Denier",mode:"Prélèvement",origine:"France",recu:null});
+    }
+  }
+  const ponct = [["f2",150,"Denier","Chèque",-200],["f3",300,"Denier","Chèque",-150],["f5",120,"Denier","Carte bancaire",-95],["f6",80,"Denier","Carte bancaire",-60],
+    ["f9",200,"Denier","Virement",-40],["f7",60,"Denier","Carte bancaire",-12],["f4",500,"Travaux","Virement",-120],["f8",250,"Travaux","Chèque",-70],
+    ["f3",100,"Travaux","Chèque",-30],["f1",150,"Travaux","Carte bancaire",-18],["f5",200,"Casuel","Chèque",-50],["f6",80,"Casuel","Carte bancaire",-22],
+    ["f2",400,"Travaux","Virement",-8],["f10",100,"Travaux","Carte bancaire",-4]];
+  for(const [f,m,fo,mo,o] of ponct){ const dt=d(o); if(dt.getFullYear()!==TODAY.getFullYear()) continue; S.dons.push({id:uid("d"),date:iso(dt),foyer:f,montant:m,fonds:fo,mode:mo,origine:"France",recu:null}); }
+  for(let w=0; w<40; w++){
+    const dt = add(nextSun,-7*(w+1)); if(dt<y0) break;
+    S.dons.push({id:uid("d"),date:iso(dt),foyer:null,donateur:"Quête dominicale",montant:Math.round(380+rnd()*260),fonds:"Quête",mode:"Espèces",origine:"France",recu:null,anonyme:true});
+    S.dons.push({id:uid("d"),date:iso(dt),foyer:null,donateur:"Quête sans contact",montant:Math.round(90+rnd()*120),fonds:"Quête",mode:"Carte bancaire",origine:"France",recu:null,anonyme:true});
+  }
+  const etr = d(-90); if(etr.getFullYear()===TODAY.getFullYear())
+    S.dons.push({id:uid("d"),date:iso(etr),foyer:null,donateur:"Paroisse Saint-Nicolas de Fribourg (Suisse)",montant:4000,fonds:"Travaux",mode:"Virement",origine:"Étranger",recu:null});
+  // quelques reçus déjà émis
+  let n=1; S.dons.filter(x=>x.foyer && x.fonds==="Travaux").slice(0,3).forEach(x=>{ x.recu = TODAY.getFullYear()+"-"+String(n++).padStart(4,"0"); });
+  S.nextRecu = n;
+  S.dons.sort((a,b)=>b.date.localeCompare(a.date));
+})();
+
+const sat = add(nextSun,-1);
+S.messes = [
+  {id:"m1",date:iso(sat),heure:"18h30",lieu:"Chapelle Saint-Roch"},
+  {id:"m2",date:iso(nextSun),heure:"10h30",lieu:"Église Notre-Dame"},
+  ...[1,2,3,4,5].map(k=>{ const x=add(nextSun,k); return x.getDay()>=2&&x.getDay()<=5 ? {id:"m"+(10+k),date:iso(x),heure:"9h00",lieu:"Église Notre-Dame"} : null; }).filter(Boolean),
+  {id:"m3",date:iso(add(nextSun,6)),heure:"18h30",lieu:"Chapelle Saint-Roch"},
+  {id:"m4",date:iso(add(nextSun,7)),heure:"10h30",lieu:"Église Notre-Dame"}
+];
+(function(){ // messes en semaine avant dimanche
+  for(let k=1;k<7;k++){ const x=add(TODAY,k-1); if(x>=sat) break; if(x.getDay()>=2&&x.getDay()<=5) S.messes.push({id:"mw"+k,date:iso(x),heure:"9h00",lieu:"Église Notre-Dame"}); }
+  S.messes.sort((a,b)=>(a.date+a.heure.padStart(5,"0")).localeCompare(b.date+b.heure.padStart(5,"0")));
+})();
+const mid = i => S.messes[Math.min(i,S.messes.length-1)].id;
+S.intentions = [
+  {id:uid("i"),messe:mid(0),texte:"Pour le repos de l'âme de Jean Leroy",demandeur:"Odette Leroy",offrande:18,paye:true},
+  {id:uid("i"),messe:mid(1),texte:"Action de grâce pour les 50 ans de mariage de Michel et Anne",demandeur:"Famille Rousseau",offrande:18,paye:true},
+  {id:uid("i"),messe:mid(2),texte:"Pour les défunts des familles Martin et Bardet",demandeur:"Claire Martin",offrande:18,paye:true},
+  {id:uid("i"),messe:mid(2),texte:"Pour la guérison de Marcel",demandeur:"Isabelle Garnier",offrande:18,paye:false},
+  {id:uid("i"),messe:mid(3),texte:"Pour les âmes du purgatoire",demandeur:"Anonyme",offrande:18,paye:true},
+  {id:uid("i"),messe:mid(5),texte:"Pour Gabriel, qui sera bientôt baptisé",demandeur:"Thao Nguyen",offrande:18,paye:true},
+  {id:uid("i"),messe:mid(7),texte:"Pour la paroisse et ses bénévoles",demandeur:"Conseil pastoral",offrande:0,paye:true}
+];
+
+S.benevoles = ["Pierre Martin","Claire Martin","Michel Rousseau","Anne Rousseau","Sophie Moreau","Grâce Kouassi","Emmanuel Kouassi","Paul Lefèvre","Hélène Lefèvre","Isabelle Garnier","Karim Benali","Marion Durand","Antoine Dubreuil"];
+S.roles = [
+  {id:"acc",nom:"Accueil",detail:"Portes, feuilles de chants",places:2},
+  {id:"lec",nom:"Lectures",detail:"1re lecture, prière universelle",places:2},
+  {id:"cho",nom:"Animation des chants",detail:"Chorale ou chantre",places:1},
+  {id:"que",nom:"Quête",detail:"Paniers et terminal sans contact",places:2},
+  {id:"sac",nom:"Sacristie",detail:"Préparer l'autel, les vêtements",places:1},
+  {id:"fle",nom:"Fleurissement",detail:"La veille au soir",places:1}
+];
+S.celebs = [{id:"c1",date:iso(nextSun),titre:"Messe dominicale · 10h30"},{id:"c2",date:iso(add(nextSun,7)),titre:"Messe dominicale · 10h30"}];
+S.planning = {
+  c1:{acc:["Pierre Martin","Karim Benali"],lec:["Hélène Lefèvre",null],cho:["Grâce Kouassi"],que:["Michel Rousseau",null],sac:["Anne Rousseau"],fle:["Isabelle Garnier"]},
+  c2:{acc:["Pierre Martin",null],lec:[null,null],cho:["Grâce Kouassi"],que:["Paul Lefèvre","Emmanuel Kouassi"],sac:[null],fle:["Isabelle Garnier"]}
+};
+
+S.evenements = [
+  {id:"e1",titre:"Conseil pastoral",date:iso(d(5)),heure:"20h30",lieu:"Salle Saint-Joseph",cap:14,inscrits:11,type:"Réunion"},
+  {id:"e2",titre:"Réunion des parents · préparation au baptême",date:iso(d(9)),heure:"20h00",lieu:"Presbytère",cap:12,inscrits:7,type:"Sacrements"},
+  {id:"e3",titre:"Repas paroissial d'automne",date:iso(d(18)),heure:"12h30",lieu:"Salle des fêtes de Saint-Aubin",cap:120,inscrits:64,type:"Fraternité"},
+  {id:"e4",titre:"Concert d'orgue au profit de la toiture",date:iso(d(25)),heure:"17h00",lieu:"Église Notre-Dame",cap:200,inscrits:41,type:"Patrimoine"},
+  {id:"e5",titre:"Pèlerinage diocésain à Lourdes",date:iso(d(40)),heure:"6h30",lieu:"Départ parking de l'église",cap:50,inscrits:47,type:"Pèlerinage"}
+];
+S.parcours = [
+  {id:"p1",titre:"Baptême de Gabriel Nguyen",type:"Baptême",contact:"Thao et Minh Nguyen",etape:2,date:iso(d(32))},
+  {id:"p2",titre:"Baptême d'Inès Kouassi",type:"Baptême",contact:"Grâce et Emmanuel Kouassi",etape:1,date:null},
+  {id:"p3",titre:"Mariage de Julie Moreau et Thomas Petit",type:"Mariage",contact:"Julie Moreau",etape:2,date:iso(d(214))},
+  {id:"p4",titre:"Confirmation d'Antoine Dubreuil",type:"Confirmation",contact:"Antoine Dubreuil",etape:1,date:null},
+  {id:"p5",titre:"Baptême de Louise Bernard",type:"Baptême",contact:"Mathilde Bernard",etape:0,date:null},
+  {id:"p6",titre:"Obsèques de Raymond Faure",type:"Obsèques",contact:"Famille Faure",etape:3,date:iso(d(2))}
+];
+const ETAPES = ["Demande reçue","Rencontre avec le prêtre","Préparation","Célébration fixée"];
+
+/* ---------- Calculs ---------- */
+const year = TODAY.getFullYear();
+const donsAnnee = () => S.dons.filter(x=>x.date.startsWith(String(year)));
+const sum = a => a.reduce((s,x)=>s+x.montant,0);
+const foyer = id => S.foyers.find(f=>f.id===id);
+const donateurNom = x => x.foyer ? foyer(x.foyer).nom : x.donateur;
+const recevable = x => !x.anonyme && x.fonds!=="Quête" && !x.recu && x.origine==="France";
+const trous = () => { let n=0; for(const c of S.celebs){ for(const r of S.roles){ n += (S.planning[c.id][r.id]||[]).filter(v=>!v).length; } } return n; };
+const trousCeleb = id => S.roles.reduce((n,r)=>n+(S.planning[id][r.id]||[]).filter(v=>!v).length,0);
+
+/* ---------- Navigation ---------- */
+const ICONS = {
+ accueil:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+ fideles:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c.6-3.4 3-5.4 6-5.4s5.4 2 6 5.4"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.6c2.7.2 4.4 2 5 5.4"/>',
+ dons:'<path d="M4 7h16v12H4z"/><path d="M4 11h16M8 15h3"/>',
+ intentions:'<path d="M12 3c3 3 4 6 2.8 8.6-.7 1.5-1.9 2.4-2.8 2.4s-2.1-.9-2.8-2.4C8 9 9 6 12 3z"/><path d="M8 21h8M10 17h4v4h-4z"/>',
+ benevoles:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ evenements:'<path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z"/>',
+ parametres:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'
+};
+const ROUTES = [["accueil","Tableau de bord"],["fideles","Fidèles"],["dons","Dons et reçus"],["intentions","Intentions de messe"],["benevoles","Bénévoles"],["evenements","Événements et sacrements"],["parametres","Paramètres"]];
+function route(){ const h = location.hash.slice(1); return ROUTES.some(r=>r[0]===h) ? h : "accueil"; }
+function renderMenu(){
+  const r = route();
+  $("#menu").innerHTML = ROUTES.map(([id,l])=>`<a href="#${id}" ${id===r?'aria-current="page"':""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]}</svg>${l}</a>`).join("");
+}
+const UI = { filtreFonds:"Tous", q:"", qDons:"" };
+
+/* ---------- Vues ---------- */
+function litBanner(){
+  const L = liturgie(TODAY);
+  const nxt = same(nextSun,TODAY) ? add(TODAY,7) : nextSun; const LN = liturgie(nxt);
+  return `<section class="liturgy" aria-label="Jour liturgique">
+    <div class="stole" style="background:${LITCOL[L.couleur]}"></div>
+    <div class="body">
+      <div class="today"><div class="eyebrow">${fdateLong(TODAY)} ${TODAY.getFullYear()}</div>
+        <div class="feast">${esc(L.nom)}</div>
+        <div class="meta"><span><span class="swatch" style="background:${LITCOL[L.couleur]}"></span> ${cap(L.couleur)}</span><span>${esc(L.temps)}</span></div></div>
+      <div class="next"><div class="eyebrow">Dimanche ${nxt.getDate()===1?"1er":nxt.getDate()} ${MOIS[nxt.getMonth()]}</div>
+        <div style="font-weight:600;margin-top:3px">${esc(LN.nom)}</div>
+        <div class="meta"><span><span class="swatch" style="background:${LITCOL[LN.couleur]}"></span> ${cap(LN.couleur)}</span></div></div>
+    </div></section>`;
+}
+function fetesAVenir(n){
+  const out=[]; for(let i=1;i<75 && out.length<n;i++){ const x=add(TODAY,i); const L=liturgie(x); if(L.rang==="S"&&!(x.getDay()===0 && /Temps ordinaire|Pâques$/.test(L.nom)&&!/Christ/.test(L.nom)) || (L.rang==="F"&&x.getDay()!==0)) { if(L.nom.startsWith("Dimanche du Temps")) continue; out.push({x,L}); } }
+  return out;
+}
+function vAccueil(){
+  const da = donsAnnee(), mois = da.filter(x=>parse(x.date).getMonth()===TODAY.getMonth());
+  const denier = sum(da.filter(x=>x.fonds==="Denier")), obj = S.reglages.objectifDenier;
+  const pctAn = (TODAY - new Date(year,0,1)) / (new Date(year+1,0,1)-new Date(year,0,1));
+  const camp = sum(S.dons.filter(x=>x.fonds==="Travaux"));
+  const aRecu = da.filter(recevable), etr = sum(da.filter(x=>x.origine==="Étranger"));
+  const semaine = S.intentions.filter(i=>{ const m=S.messes.find(m=>m.id===i.messe); return m && parse(m.date)<add(TODAY,7); });
+  const nonPaye = S.intentions.filter(i=>!i.paye).length;
+  const t = trous(), t1 = trousCeleb("c1");
+  const todo = [];
+  if(t1) todo.push({lvl:"crit",t:`${t1} service${t1>1?"s":""} à pourvoir dimanche`,s:"Accueil, lectures, quête…",go:"benevoles"});
+  if(aRecu.length) todo.push({lvl:"warn",t:`${aRecu.length} dons sans reçu fiscal`,s:`${eur(sum(aRecu))} à couvrir avant l'envoi annuel`,go:"dons"});
+  if(nonPaye) todo.push({lvl:"warn",t:`${nonPaye} offrande d'intention non réglée`,s:"À encaisser à l'accueil",go:"intentions"});
+  const att = S.parcours.filter(p=>p.etape===0); if(att.length) todo.push({lvl:"blue",t:`${att.length} demande${att.length>1?"s":""} de sacrement à rappeler`,s:att.map(p=>p.titre).join(", "),go:"evenements"});
+  todo.push({lvl:etr/S.reglages.seuilEtranger>.8?"crit":"ok",t:"Ressources venant de l'étranger",s:`${eur(etr)} sur un seuil de ${eur(S.reglages.seuilEtranger)}`,go:"dons"});
+  const evts = S.evenements.slice(0,4);
+  return `${litBanner()}
+  <div class="head"><div><h1>Bonjour, l'équipe d'animation</h1><p class="sub">Voici où en est la paroisse cette semaine.</p></div>
+    <div class="toolbar"><button class="btn" data-act="newDon">Enregistrer un don</button><button class="btn primary" data-act="newIntention">Nouvelle intention</button></div></div>
+  <div class="grid g4">
+    <div class="panel stat"><div class="k">Dons en ${MOIS[TODAY.getMonth()]}</div><div class="v">${eur(sum(mois))}</div><div class="n">${mois.length} versements</div></div>
+    <div class="panel stat"><div class="k">Denier de l'Église ${year}</div><div class="v">${eur(denier)}</div><div class="bar"><i style="width:${Math.min(100,denier/obj*100).toFixed(1)}%"></i></div><div class="n">${Math.round(denier/obj*100)} % de l'objectif · ${Math.round(pctAn*100)} % de l'année écoulée</div></div>
+    <div class="panel stat"><div class="k">Services à pourvoir</div><div class="v" style="color:${t?"var(--crit)":"var(--ok)"}">${t}</div><div class="n">Sur les deux prochains dimanches</div></div>
+    <div class="panel stat"><div class="k">Intentions sur 7 jours</div><div class="v">${semaine.length}</div><div class="n">${S.messes.filter(m=>parse(m.date)<add(TODAY,7)).length} messes célébrées</div></div>
+  </div>
+  <div class="grid g32">
+    <section class="panel"><div class="panel-h"><h2>À traiter</h2></div><div class="list">
+      ${todo.map(x=>`<div class="row"><span class="dot" style="background:var(--${x.lvl==="blue"?"link":x.lvl})"></span><div class="main"><div class="t">${esc(x.t)}</div><div class="s">${esc(x.s)}</div></div><a class="btn small ghost" href="#${x.go}">Voir</a></div>`).join("")}
+    </div></section>
+    <section class="panel"><div class="panel-h"><h2>Prochains rendez-vous</h2><a class="btn small ghost" href="#evenements">Tout voir</a></div><div class="list">
+      ${evts.map(e=>{ const x=parse(e.date); return `<div class="row"><div class="datebox"><b>${x.getDate()}</b><span>${MCOURT[x.getMonth()]}</span></div><div class="main"><div class="t">${esc(e.titre)}</div><div class="s">${e.heure} · ${esc(e.lieu)}</div></div></div>`; }).join("")}
+    </div></section>
+  </div>
+  <div class="grid g2">
+    <section class="panel"><div class="panel-h"><h2>${esc(S.reglages.campagne.nom)}</h2><span class="chip flame">Campagne</span></div>
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font-family:var(--f-display);font-size:26px;font-weight:600">${eur(camp)}</span><span class="muted">collectés sur ${eur(S.reglages.campagne.objectif)}</span></div>
+      <div class="bar"><i style="width:${Math.min(100,camp/S.reglages.campagne.objectif*100).toFixed(1)}%"></i></div>
+      <p class="sub" style="font-size:13.5px">Le concert d'orgue du ${fshort(parse(S.evenements[3].date))} est dédié à cette campagne. Un QR code de don peut être imprimé sur le programme.</p></section>
+    <section class="panel"><div class="panel-h"><h2>Calendrier liturgique</h2></div><div class="list">
+      ${fetesAVenir(5).map(({x,L})=>`<div class="row"><span class="swatch" style="background:${LITCOL[L.couleur]}"></span><div class="main"><div class="t">${esc(L.nom)}</div><div class="s">${fdateLong(x)}</div></div><span class="chip">${L.rang==="S"?"Solennité":"Fête"}</span></div>`).join("")}
+    </div></section>
+  </div>`;
+}
+
+function vFideles(){
+  const q = UI.q.toLowerCase();
+  const rows = S.foyers.filter(f=> !q || (f.nom+" "+f.ville+" "+f.membres.map(m=>m.p).join(" ")).toLowerCase().includes(q));
+  const da = donsAnnee();
+  const roles = p => { const r=new Set(); for(const c of S.celebs) for(const ro of S.roles) if((S.planning[c.id][ro.id]||[]).includes(p)) r.add(ro.nom); return [...r]; };
+  return `<div class="head"><div><h1>Fidèles</h1><p class="sub">${S.foyers.length} foyers · ${S.foyers.reduce((n,f)=>n+f.membres.length,0)} personnes</p></div>
+    <div class="toolbar"><input class="input" id="qFoyers" type="search" placeholder="Rechercher un nom, une ville…" value="${esc(UI.q)}" aria-label="Rechercher"><button class="btn primary" data-act="newFoyer">Ajouter un foyer</button></div></div>
+  <section class="panel"><div class="tablewrap"><table>
+    <thead><tr><th>Foyer</th><th>Personnes</th><th>Commune</th><th>Engagements</th><th class="num">Dons ${year}</th><th>Dernier don</th></tr></thead>
+    <tbody>${rows.map(f=>{ const ds = da.filter(x=>x.foyer===f.id); const last = S.dons.find(x=>x.foyer===f.id);
+      const eng = [...new Set(f.membres.flatMap(m=>roles(m.p)))];
+      return `<tr class="click" data-act="openFoyer" data-id="${f.id}"><td><strong>${esc(f.nom)}</strong><div class="muted" style="font-size:12.5px">Inscrit depuis ${f.depuis}</div></td>
+      <td>${f.membres.length}</td><td>${esc(f.ville)}</td>
+      <td>${eng.length?eng.map(e=>`<span class="chip blue">${esc(e)}</span>`).join(" "):'<span class="muted">—</span>'}</td>
+      <td class="num">${ds.length?eur(sum(ds)):'<span class="muted">—</span>'}</td><td>${last?fshort(parse(last.date)):'<span class="muted">—</span>'}</td></tr>`; }).join("") || `<tr><td colspan="6" class="muted">Aucun foyer ne correspond à « ${esc(UI.q)} ».</td></tr>`}</tbody>
+  </table></div></section>
+  <p class="sub" style="font-size:13px">L'appartenance religieuse est une donnée sensible (article 9 du RGPD). Les notes pastorales ne sont visibles que par le curé et les personnes qu'il désigne.</p>`;
+}
+
+function chartDons(){
+  const months=[]; for(let k=5;k>=0;k--){ const m=new Date(TODAY.getFullYear(),TODAY.getMonth()-k,1); months.push(m); }
+  const series = months.map(m=>{ const ds=S.dons.filter(x=>{ const t=parse(x.date); return t.getFullYear()===m.getFullYear()&&t.getMonth()===m.getMonth(); });
+    return {m, denier:sum(ds.filter(x=>x.fonds==="Denier")), quete:sum(ds.filter(x=>x.fonds==="Quête")), autre:sum(ds.filter(x=>!["Denier","Quête"].includes(x.fonds)))}; });
+  const max = Math.max(...series.map(s=>s.denier+s.quete+s.autre),1);
+  const step = max>8000?2000:max>4000?1000:500; const top = Math.ceil(max/step)*step;
+  const W=560,H=200,pl=48,pb=24,pt=8,iw=W-pl-12,ih=H-pb-pt,bw=iw/series.length*0.56;
+  const y = v => pt+ih-(v/top)*ih;
+  let g=""; for(let v=0; v<=top; v+=step){ g+=`<line x1="${pl}" x2="${W-8}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${v>=1000?(v/1000)+" k€":v+" €"}</text>`; }
+  let b=""; series.forEach((s,i)=>{ const cx=pl+iw/series.length*(i+.5), x=cx-bw/2; let base=0;
+    for(const [k,c] of [["denier","var(--flame)"],["quete","var(--link)"],["autre","var(--ink-3)"]]){ const v=s[k]; if(!v) continue; b+=`<rect x="${x}" y="${y(base+v)}" width="${bw}" height="${y(base)-y(base+v)}" fill="${c}"><title>${cap(MOIS[s.m.getMonth()])} · ${k==="denier"?"Denier":k==="quete"?"Quêtes":"Travaux, casuel, intentions"} : ${eur(v)}</title></rect>`; base+=v; }
+    b+=`<text x="${cx}" y="${H-6}" text-anchor="middle">${MCOURT[s.m.getMonth()]}</text>`; });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Dons par mois sur six mois">${g}${b}</svg>
+  <div class="toolbar" style="font-size:13px;color:var(--ink-2);gap:14px"><span><span class="swatch" style="background:var(--flame);border-radius:3px"></span> Denier</span><span><span class="swatch" style="background:var(--link);border-radius:3px"></span> Quêtes</span><span><span class="swatch" style="background:var(--ink-3);border-radius:3px"></span> Travaux, casuel, intentions</span></div>`;
+}
+function vDons(){
+  const da = donsAnnee(), recus = da.filter(x=>x.recu), aRecu = da.filter(recevable), etr = sum(da.filter(x=>x.origine==="Étranger"));
+  const seuil = S.reglages.seuilEtranger, pE = etr/seuil;
+  const q = UI.qDons.toLowerCase();
+  const list = S.dons.filter(x=>(UI.filtreFonds==="Tous"||x.fonds===UI.filtreFonds) && (!q || donateurNom(x).toLowerCase().includes(q))).slice(0,60);
+  return `<div class="head"><div><h1>Dons et reçus fiscaux</h1><p class="sub">Exercice ${year} · ${da.length} versements enregistrés</p></div>
+    <div class="toolbar"><button class="btn" data-act="annual">Préparer les reçus annuels</button><button class="btn primary" data-act="newDon">Enregistrer un don</button></div></div>
+  <div class="grid g4">
+    ${[["Total "+year,sum(da)],["Denier",sum(da.filter(x=>x.fonds==="Denier"))],["Quêtes",sum(da.filter(x=>x.fonds==="Quête"))],["Travaux",sum(da.filter(x=>x.fonds==="Travaux"))]].map(([k,v])=>`<div class="panel stat"><div class="k">${k}</div><div class="v">${eur(v)}</div></div>`).join("")}
+  </div>
+  <div class="grid g32">
+    <section class="panel"><div class="panel-h"><h2>Six derniers mois</h2></div>${chartDons()}</section>
+    <section class="panel"><div class="panel-h"><h2>Conformité ${year}</h2><span class="chip ${pE>.8?"crit":"ok"}">${pE>.8?"Seuil proche":"À jour"}</span></div>
+      <div class="list">
+        <div class="row"><div class="main"><div class="t">Reçus fiscaux émis</div><div class="s">${recus.length} reçus pour ${eur(sum(recus))}, à reporter dans la déclaration annuelle des dons</div></div></div>
+        <div class="row"><div class="main"><div class="t">Dons nominatifs sans reçu</div><div class="s">${aRecu.length} versements, ${eur(sum(aRecu))}</div></div><button class="btn small" data-act="annual">Traiter</button></div>
+        <div class="row" style="flex-wrap:wrap"><div class="main"><div class="t">Ressources venant de l'étranger</div><div class="s">${eur(etr)} cumulés sur un seuil de déclaration de ${eur(seuil)}</div>
+          <div class="bar ${pE>.8?"":"blue"}"><i style="width:${Math.min(100,pE*100).toFixed(1)}%;${pE>.8?"background:var(--crit)":""}"></i></div></div></div>
+      </div>
+      <p class="sub" style="font-size:12.5px">Seuils et modalités paramétrables, à faire valider par un juriste avant la mise en production.</p></section>
+  </div>
+  <section class="panel"><div class="panel-h"><h2>Versements</h2>
+    <div class="toolbar"><input class="input" id="qDons" type="search" placeholder="Donateur…" value="${esc(UI.qDons)}" aria-label="Rechercher un donateur">
+    <div class="seg" role="group" aria-label="Filtrer par fonds">${["Tous",...FONDS].map(f=>`<button data-act="fonds" data-v="${f}" aria-pressed="${UI.filtreFonds===f}">${f==="Intention de messe"?"Intentions":f}</button>`).join("")}</div></div></div>
+    <div class="tablewrap"><table><thead><tr><th>Date</th><th>Donateur</th><th>Fonds</th><th>Mode</th><th class="num">Montant</th><th>Reçu fiscal</th></tr></thead>
+    <tbody>${list.map(x=>`<tr><td>${fshort(parse(x.date))}</td><td>${x.foyer?`<a href="#fideles" data-act="openFoyer" data-id="${x.foyer}">${esc(donateurNom(x))}</a>`:esc(donateurNom(x))}${x.origine==="Étranger"?' <span class="chip warn">Étranger</span>':""}</td>
+      <td>${esc(x.fonds)}</td><td class="muted">${esc(x.mode)}</td><td class="num"><strong>${eur(x.montant)}</strong></td>
+      <td>${x.recu?`<button class="btn small ghost" data-act="viewRecu" data-id="${x.id}">N° ${x.recu}</button>`: recevable(x)?`<button class="btn small" data-act="viewRecu" data-id="${x.id}">Émettre</button>`:`<span class="muted" style="font-size:13px">${x.anonyme?"Quête anonyme":x.origine==="Étranger"?"Non éligible":"—"}</span>`}</td></tr>`).join("") || '<tr><td colspan="6" class="muted">Aucun versement pour ce filtre.</td></tr>'}</tbody></table></div></section>`;
+}
+
+function vIntentions(){
+  const by = S.messes.map(m=>({m, it:S.intentions.filter(i=>i.messe===m.id)}));
+  const tot = sum(S.intentions.map(i=>({montant:i.offrande})));
+  return `<div class="head"><div><h1>Intentions de messe</h1><p class="sub">${S.intentions.length} intentions confiées · ${eur(tot)} d'offrandes · offrande indicative ${eur(S.reglages.offrande)}</p></div>
+    <button class="btn primary" data-act="newIntention">Nouvelle intention</button></div>
+  <div class="grid g2">${by.map(({m,it})=>{ const x=parse(m.date), L=liturgie(x);
+    return `<section class="panel"><div class="panel-h"><div style="display:flex;gap:12px;align-items:center;min-width:0"><div class="datebox"><b>${x.getDate()}</b><span>${MCOURT[x.getMonth()]}</span></div>
+      <div style="min-width:0"><div style="font-weight:600">${cap(JOURS[x.getDay()])} · ${m.heure}</div><div class="muted" style="font-size:13px">${esc(m.lieu)}</div></div></div>
+      <span class="chip" title="${esc(L.nom)}"><span class="swatch" style="background:${LITCOL[L.couleur]};width:10px;height:10px"></span>${esc(L.nom.length>30?L.temps:L.nom)}</span></div>
+      <div class="list">${it.length? it.map(i=>`<div class="row"><div class="main"><div class="t" style="font-weight:500">${esc(i.texte)}</div><div class="s">Demandée par ${esc(i.demandeur)}${i.offrande?" · "+eur(i.offrande):" · sans offrande"}</div></div>
+        ${i.paye?'<span class="chip ok">Réglée</span>':`<button class="btn small" data-act="payer" data-id="${i.id}">Marquer réglée</button>`}</div>`).join("")
+        : '<div class="row"><div class="main s muted">Aucune intention pour cette messe.</div></div>'}</div></section>`; }).join("")}</div>`;
+}
+
+function vBenevoles(){
+  const cols = S.celebs.length;
+  return `<div class="head"><div><h1>Planning des bénévoles</h1><p class="sub">${S.benevoles.length} bénévoles actifs · ${trous()} services à pourvoir</p></div>
+    <button class="btn primary" data-act="rappel">Relancer pour les services vides</button></div>
+  <section class="panel"><div class="tablewrap"><div class="roster" style="--cols:${cols}">
+    <div class="rh">Service</div>${S.celebs.map(c=>{ const x=parse(c.date), L=liturgie(x); return `<div class="rh">${fdateLong(x)}<div style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-2);margin-top:2px"><span class="swatch" style="background:${LITCOL[L.couleur]};width:10px;height:10px"></span> ${esc(L.nom)}</div></div>`; }).join("")}
+    ${S.roles.map(r=>`<div class="role">${esc(r.nom)}<small>${esc(r.detail)}</small></div>${S.celebs.map(c=>`<div class="slot">${(S.planning[c.id][r.id]||[]).map((p,k)=> p ? `<span class="who"><span class="av">${initials(p)}</span>${esc(p)}</span>` : `<button class="empty" data-act="assign" data-c="${c.id}" data-r="${r.id}" data-k="${k}">À pourvoir</button>`).join("")}</div>`).join("")}`).join("")}
+  </div></div></section>
+  <p class="sub" style="font-size:13px">Chaque bénévole reçoit un rappel par SMS ou par e-mail trois jours avant son service, et peut demander un remplacement depuis l'application des fidèles.</p>`;
+}
+
+function vEvenements(){
+  return `<div class="head"><div><h1>Événements et sacrements</h1><p class="sub">${S.evenements.length} événements à venir · ${S.parcours.length} parcours en cours</p></div>
+    <button class="btn primary" data-act="newEvent">Créer un événement</button></div>
+  <div class="grid g2">${S.evenements.map(e=>{ const x=parse(e.date), p=e.inscrits/e.cap; return `<section class="panel">
+    <div style="display:flex;gap:14px;align-items:flex-start"><div class="datebox"><b>${x.getDate()}</b><span>${MCOURT[x.getMonth()]}</span></div>
+    <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>${esc(e.titre)}</strong><span class="chip">${esc(e.type)}</span></div>
+    <div class="muted" style="font-size:13px;margin-top:2px">${fdateLong(x)} · ${e.heure} · ${esc(e.lieu)}</div>
+    <div class="bar ${p>=.9?"":"blue"}"><i style="width:${Math.min(100,p*100)}%"></i></div>
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:13px;flex-wrap:wrap"><span>${e.inscrits} inscrits sur ${e.cap}${p>=.9?' · <strong style="color:var(--warn)">presque complet</strong>':""}</span>
+    <button class="btn small ghost" data-act="inscrire" data-id="${e.id}" ${e.inscrits>=e.cap?"disabled":""}>${e.inscrits>=e.cap?"Complet":"Inscrire une personne"}</button></div></div></div></section>`; }).join("")}</div>
+  <section class="panel"><div class="panel-h"><h2>Parcours de sacrements et obsèques</h2><button class="btn small" data-act="newParcours">Nouvelle demande</button></div>
+    <div class="tablewrap"><div class="kanban">${ETAPES.map((et,k)=>{ const items=S.parcours.filter(p=>p.etape===k); return `<div class="col"><h3><span>${et}</span><span class="muted">${items.length}</span></h3>
+      ${items.map(p=>`<div class="card"><span class="chip ${p.type==="Obsèques"?"":"flame"}" style="align-self:flex-start">${p.type}</span><div class="t">${esc(p.titre)}</div><div class="s">${esc(p.contact)}${p.date?" · "+fshort(parse(p.date)):""}</div>
+        ${k<3?`<button class="btn small" data-act="etape" data-id="${p.id}">${k===2?"Fixer la célébration":"Étape suivante"}</button>`:""}</div>`).join("") || '<div class="s muted" style="padding:6px 4px;font-size:13px">Rien en attente</div>'}</div>`; }).join("")}</div></div></section>`;
+}
+
+const TRADS = [
+  {id:"cat",nom:"Christianisme",sous:"Catholique · protestant et orthodoxe ensuite",actif:true,lieu:"Paroisse",resp:"Curé",fid:"Paroissiens",mods:["Denier, quête, casuel, intentions de messe","Calendrier liturgique et couleurs","Baptêmes, mariages, obsèques, registres"]},
+  {id:"isl",nom:"Islam",sous:"Prochainement",lieu:"Mosquée",resp:"Imam",fid:"Fidèles",mods:["Zakat avec calculateur, zakat al-fitr, sadaqa","Calendrier hégirien et horaires des prières","Cours d'arabe et de Coran, iftars collectifs"]},
+  {id:"jud",nom:"Judaïsme",sous:"Prochainement",lieu:"Synagogue",resp:"Rabbin",fid:"Membres",mods:["Tsedaka, cotisations, places pour les fêtes","Calendrier hébraïque, chabbat, yahrzeit","Bar et bat mitsva, minyan, talmud torah"]},
+  {id:"bou",nom:"Bouddhisme",sous:"Prochainement",lieu:"Centre ou temple",resp:"Enseignant",fid:"Pratiquants",mods:["Dana et parrainages","Calendrier lunaire, Vesak, uposatha","Retraites, sessions de méditation, enseignements"]}
+];
+function vParametres(){
+  const R = S.reglages;
+  return `<div class="head"><div><h1>Paramètres</h1><p class="sub">Le vocabulaire, les fonds et le calendrier s'adaptent à la tradition du lieu de culte.</p></div></div>
+  <section class="panel"><div class="panel-h"><h2>Le lieu de culte</h2></div>
+    <form class="f" id="fReglages">
+      <label class="full">Nom<input class="input" id="rNom" value="${esc(R.nom)}"></label>
+      <label>Statut juridique<select class="input" id="rStatut"><option value="cultuelle" ${R.statut==="cultuelle"?"selected":""}>Association cultuelle (loi 1905)</option><option value="1901" ${R.statut==="1901"?"selected":""}>Association loi 1901 à objet mixte</option></select></label>
+      <label>Objectif du denier (€)<input class="input" id="rObj" type="number" min="0" step="500" value="${R.objectifDenier}"></label>
+      <label>Offrande indicative pour une intention (€)<input class="input" id="rOff" type="number" min="0" value="${R.offrande}"></label>
+      <label>Seuil de déclaration des ressources étrangères (€)<input class="input" id="rSeuil" type="number" min="0" step="100" value="${R.seuilEtranger}"></label>
+      <div class="actions"><button class="btn primary" type="submit">Enregistrer</button></div>
+    </form></section>
+  <h2>Traditions</h2>
+  <div class="grid g4">${TRADS.map(t=>`<section class="panel trad ${t.actif?"active":""}"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap"><strong style="font-size:16px">${t.nom}</strong><span class="chip ${t.actif?"flame":""}">${t.actif?"Activé":"Bientôt"}</span></div>
+    <div class="muted" style="font-size:12.5px">${t.sous}</div>
+    <dl class="kv" style="font-size:13px;margin:4px 0"><dt>Lieu</dt><dd style="user-select:auto">${t.lieu}</dd><dt>Responsable</dt><dd style="user-select:auto">${t.resp}</dd><dt>Communauté</dt><dd style="user-select:auto">${t.fid}</dd></dl>
+    <ul>${t.mods.map(m=>`<li>${m}</li>`).join("")}</ul></section>`).join("")}</div>`;
+}
+
+const VIEWS = {accueil:vAccueil,fideles:vFideles,dons:vDons,intentions:vIntentions,benevoles:vBenevoles,evenements:vEvenements,parametres:vParametres};
+function render(keepFocus){
+  const r = route(); renderMenu();
+  const active = keepFocus ? document.activeElement : null, aid = active && active.id, pos = active && active.selectionStart;
+  $("#view").innerHTML = VIEWS[r]();
+  $("#placeName").textContent = S.reglages.nom;
+  $("#placeSub").textContent = (S.reglages.statut==="cultuelle"?"Association cultuelle":"Association loi 1901")+" · 2 lieux de culte";
+  document.title = "LantRne";
+  if(aid){ const el=document.getElementById(aid); if(el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(e){} } }
+}
+
+/* ---------- Fenêtres ---------- */
+function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2800); }
+function close(){ $("#layer").innerHTML=""; }
+function modal(html,wide){ $("#layer").innerHTML = `<div class="scrim center" data-act="scrim"><div class="modal ${wide?"wide":""}" role="dialog" aria-modal="true">${html}</div></div>`; const f=$("#layer input, #layer select, #layer button.btn"); if(f) f.focus(); }
+function drawer(html){ $("#layer").innerHTML = `<div class="scrim" data-act="scrim"><div class="drawer" role="dialog" aria-modal="true">${html}</div></div>`; $("#layer .x").focus(); }
+const mh = (t,s) => `<div class="modal-h"><div><h2>${t}</h2>${s?`<p class="sub" style="font-size:13.5px">${s}</p>`:""}</div><button class="x" data-act="close" aria-label="Fermer">×</button></div>`;
+
+function openFoyer(id){
+  const f = foyer(id), ds = S.dons.filter(x=>x.foyer===id);
+  drawer(`${mh(esc(f.nom),`Inscrit depuis ${f.depuis} · ${esc(f.ville)}`)}
+    <dl class="kv"><dt>Adresse</dt><dd>${esc(f.adresse)}, ${esc(f.ville)}</dd><dt>Téléphone</dt><dd>${esc(f.tel)||"—"}</dd><dt>E-mail</dt><dd>${esc(f.email)||"—"}</dd></dl>
+    <div><div class="eyebrow" style="margin-bottom:6px">Membres du foyer</div><div class="list">${f.membres.map(m=>`<div class="row"><span class="av">${initials(m.p)}</span><div class="main"><div class="t">${esc(m.p)}</div><div class="s">${esc(m.r)} · ${esc(m.sac)}</div></div></div>`).join("")}</div></div>
+    <div><div class="eyebrow" style="margin-bottom:6px">Dons (${ds.length})</div><div class="list">${ds.slice(0,8).map(x=>`<div class="row"><div class="main"><div class="t" style="font-weight:500">${esc(x.fonds)} · ${esc(x.mode)}</div><div class="s">${fdate(parse(x.date))}${x.recu?" · reçu n° "+x.recu:""}</div></div><strong>${eur(x.montant)}</strong></div>`).join("") || '<div class="row s muted">Aucun don enregistré.</div>'}</div>
+      ${ds.length>8?`<p class="sub" style="font-size:13px">et ${ds.length-8} versements plus anciens</p>`:""}</div>
+    <div><div class="eyebrow" style="margin-bottom:6px">Note pastorale <span class="chip" style="margin-left:6px">Confidentiel</span></div><div class="confid">${esc(f.note)||'<span class="muted">Aucune note.</span>'}</div></div>
+    <div class="toolbar"><button class="btn primary" data-act="newDon" data-foyer="${f.id}">Enregistrer un don</button></div>`);
+}
+function formDon(foyerId){
+  modal(`${mh("Enregistrer un don")}<form class="f" id="fDon">
+    <label class="full">Donateur<select class="input" id="dFoyer"><option value="">Quête ou don anonyme</option>${S.foyers.map(f=>`<option value="${f.id}" ${f.id===foyerId?"selected":""}>${esc(f.nom)}</option>`).join("")}</select></label>
+    <label>Montant (€)<input class="input" id="dMontant" type="number" min="1" step="0.01" required value="50"></label>
+    <label>Date<input class="input" id="dDate" type="date" value="${iso(TODAY)}" required></label>
+    <label>Fonds<select class="input" id="dFonds">${FONDS.map(f=>`<option>${f}</option>`).join("")}</select></label>
+    <label>Mode de versement<select class="input" id="dMode">${MODES.map(m=>`<option>${m}</option>`).join("")}</select></label>
+    <label class="full check"><input type="checkbox" id="dEtr"> Provient d'une personne ou d'un organisme établi à l'étranger</label>
+    <div class="actions"><button class="btn" type="button" data-act="close">Annuler</button><button class="btn primary" type="submit">Enregistrer</button></div></form>`);
+}
+function viewRecu(id){
+  const x = S.dons.find(d=>d.id===id), f = foyer(x.foyer);
+  const nom = f ? f.membres[0].p : x.donateur, adr = f ? `${f.adresse}, ${f.ville}` : "";
+  modal(`${mh(x.recu?"Reçu fiscal n° "+x.recu:"Aperçu du reçu fiscal","Reçu au titre des dons à certains organismes d'intérêt général, sur le modèle du Cerfa n° 11580")}
+  <div class="receipt">
+    <div class="rt"><div><h4>Bénéficiaire</h4><b>${esc(S.reglages.nom)}</b><div class="muted">${S.reglages.statut==="cultuelle"?"Association cultuelle (loi du 9 décembre 1905)":"Association loi 1901"} · objet : exercice du culte catholique</div></div>
+      <div style="text-align:right"><h4>Numéro d'ordre</h4><b>${x.recu||"attribué à l'émission"}</b></div></div>
+    <div><h4>Donateur</h4><div><strong>${esc(nom)}</strong>${adr?" · "+esc(adr):""}</div></div>
+    <div><h4>Somme versée</h4><div class="big">${eur(x.montant,true)}</div><div>${cap(enLettres(x.montant))}</div></div>
+    <div class="boxes"><span class="on">Don manuel</span><span>Acte authentique</span><span>Acte sous seing privé</span></div>
+    <div class="boxes"><span class="on">Numéraire</span><span>Titres de sociétés cotées</span><span>Autres</span></div>
+    <div class="boxes">${["Espèces","Chèque","Virement, prélèvement, carte bancaire"].map(m=>`<span class="${(m==="Espèces"&&x.mode==="Espèces")||(m==="Chèque"&&x.mode==="Chèque")||(m.startsWith("Virement")&&["Virement","Prélèvement","Carte bancaire"].includes(x.mode))?"on":""}">${m}</span>`).join("")}</div>
+    <div>Date du versement : <strong>${fdate(parse(x.date))}</strong></div>
+    <div class="muted">Le bénéficiaire certifie sur l'honneur que les dons et versements qu'il reçoit ouvrent droit à la réduction d'impôt prévue à l'article 200 du Code général des impôts.</div>
+  </div>
+  <div class="note">Réduction d'impôt estimée pour le donateur : <strong>${eur(x.montant*0.66,true)}</strong> (66 % du don, dans la limite de 20 % du revenu imposable).</div>
+  <div class="toolbar" style="justify-content:flex-end">${x.recu?`<button class="btn" data-act="close">Fermer</button><button class="btn primary" data-act="sendRecu" data-id="${x.id}">Envoyer par e-mail</button>`:`<button class="btn" data-act="close">Annuler</button><button class="btn primary" data-act="emitRecu" data-id="${x.id}">Émettre le reçu</button>`}</div>`, true);
+}
+function annual(){
+  const da = donsAnnee().filter(recevable); const by={};
+  da.forEach(x=>{ (by[x.foyer]=by[x.foyer]||[]).push(x); });
+  const rows = Object.entries(by).map(([fid,xs])=>({f:foyer(fid),n:xs.length,t:sum(xs)})).sort((a,b)=>b.t-a.t);
+  modal(`${mh("Reçus annuels "+year,"Un reçu récapitulatif par foyer pour tous les dons nominatifs sans reçu. Les quêtes anonymes et les ressources étrangères en sont exclues.")}
+   ${rows.length?`<div class="tablewrap" style="margin:0"><table><thead><tr><th>Foyer</th><th class="num">Versements</th><th class="num">Total</th><th class="num">Réduction estimée</th></tr></thead><tbody>
+   ${rows.map(r=>`<tr><td>${esc(r.f.nom)}${r.f.email?"":' <span class="chip warn">Envoi postal</span>'}</td><td class="num">${r.n}</td><td class="num"><strong>${eur(r.t)}</strong></td><td class="num">${eur(r.t*.66)}</td></tr>`).join("")}</tbody></table></div>
+   <div class="toolbar" style="justify-content:flex-end"><button class="btn" data-act="close">Annuler</button><button class="btn primary" data-act="emitAll">Émettre ${rows.length} reçus</button></div>`
+   :`<p>Tous les dons nominatifs de ${year} ont déjà leur reçu.</p><div class="toolbar" style="justify-content:flex-end"><button class="btn" data-act="close">Fermer</button></div>`}`, true);
+}
+function formIntention(){
+  modal(`${mh("Nouvelle intention de messe")}<form class="f" id="fInt">
+    <label class="full">Intention<input class="input" id="iTexte" required placeholder="Pour le repos de l'âme de…"></label>
+    <label>Demandée par<input class="input" id="iDem" required placeholder="Nom"></label>
+    <label>Offrande (€)<input class="input" id="iOff" type="number" min="0" value="${S.reglages.offrande}"></label>
+    <label class="full">Messe<select class="input" id="iMesse">${S.messes.map(m=>{ const x=parse(m.date); return `<option value="${m.id}">${fdateLong(x)} · ${m.heure} · ${esc(m.lieu)} (${S.intentions.filter(i=>i.messe===m.id).length} intention(s))</option>`; }).join("")}</select></label>
+    <label class="full check"><input type="checkbox" id="iPaye" checked> Offrande réglée</label>
+    <div class="actions"><button class="btn" type="button" data-act="close">Annuler</button><button class="btn primary" type="submit">Enregistrer</button></div></form>`);
+}
+function formAssign(c,r,k){
+  const role = S.roles.find(x=>x.id===r), cel = S.celebs.find(x=>x.id===c);
+  const deja = new Set(Object.values(S.planning[c]).flat().filter(Boolean));
+  modal(`${mh(esc(role.nom),fdateLong(parse(cel.date))+" · "+esc(cel.titre))}
+    <div class="list">${S.benevoles.map(p=>`<div class="row"><span class="av">${initials(p)}</span><div class="main"><div class="t" style="font-weight:500">${esc(p)}</div>${deja.has(p)?'<div class="s">Déjà en service ce jour-là</div>':""}</div><button class="btn small ${deja.has(p)?"":"primary"}" data-act="doAssign" data-c="${c}" data-r="${r}" data-k="${k}" data-p="${esc(p)}">Affecter</button></div>`).join("")}</div>`);
+}
+function formFoyer(){
+  modal(`${mh("Ajouter un foyer")}<form class="f" id="fFoyer">
+    <label class="full">Nom du foyer<input class="input" id="fNom" required placeholder="Famille Dupont"></label>
+    <label>Prénom et nom du premier membre<input class="input" id="fMembre" required></label>
+    <label>Commune<input class="input" id="fVille" value="Saint-Aubin"></label>
+    <label class="full">Adresse<input class="input" id="fAdr"></label>
+    <label>Téléphone<input class="input" id="fTel"></label>
+    <label>E-mail<input class="input" id="fMail" type="email"></label>
+    <label class="full check"><input type="checkbox" id="fConsent" required> La personne a donné son consentement à l'enregistrement de ses données par la paroisse</label>
+    <div class="actions"><button class="btn" type="button" data-act="close">Annuler</button><button class="btn primary" type="submit">Ajouter</button></div></form>`);
+}
+function formEvent(){
+  modal(`${mh("Créer un événement")}<form class="f" id="fEvt">
+    <label class="full">Titre<input class="input" id="eTitre" required placeholder="Veillée de prière"></label>
+    <label>Date<input class="input" id="eDate" type="date" required value="${iso(d(14))}"></label>
+    <label>Heure<input class="input" id="eHeure" value="20h30"></label>
+    <label>Lieu<input class="input" id="eLieu" value="Église Notre-Dame"></label>
+    <label>Places<input class="input" id="eCap" type="number" min="1" value="40"></label>
+    <div class="actions"><button class="btn" type="button" data-act="close">Annuler</button><button class="btn primary" type="submit">Créer</button></div></form>`);
+}
+function formParcours(){
+  modal(`${mh("Nouvelle demande")}<form class="f" id="fPar">
+    <label>Type<select class="input" id="pType"><option>Baptême</option><option>Mariage</option><option>Confirmation</option><option>Première communion</option><option>Obsèques</option></select></label>
+    <label>Pour<input class="input" id="pNom" required placeholder="Prénom et nom"></label>
+    <label class="full">Personne à contacter<input class="input" id="pContact" required></label>
+    <div class="actions"><button class="btn" type="button" data-act="close">Annuler</button><button class="btn primary" type="submit">Enregistrer</button></div></form>`);
+}
+
+/* ---------- Événements ---------- */
+document.addEventListener("click", e=>{
+  const el = e.target.closest("[data-act]"); if(!el) return;
+  const a = el.dataset.act;
+  if(a==="scrim"){ if(e.target===el) close(); return; }
+  if(a==="close") return close();
+  if(a==="openFoyer"){ e.preventDefault(); return openFoyer(el.dataset.id); }
+  if(a==="newDon") return formDon(el.dataset.foyer);
+  if(a==="newIntention") return formIntention();
+  if(a==="newFoyer") return formFoyer();
+  if(a==="newEvent") return formEvent();
+  if(a==="newParcours") return formParcours();
+  if(a==="annual") return annual();
+  if(a==="viewRecu") return viewRecu(el.dataset.id);
+  if(a==="fonds"){ UI.filtreFonds = el.dataset.v; return render(); }
+  if(a==="emitRecu"){ const x=S.dons.find(d=>d.id===el.dataset.id); x.recu = year+"-"+String(S.nextRecu++).padStart(4,"0"); render(); viewRecu(x.id); return toast("Reçu n° "+x.recu+" émis"); }
+  if(a==="sendRecu"){ close(); return toast("Reçu envoyé par e-mail (simulation)"); }
+  if(a==="emitAll"){ const da=donsAnnee().filter(recevable); const by={}; da.forEach(x=>{ (by[x.foyer]=by[x.foyer]||[]).push(x); });
+    let n=0; Object.values(by).forEach(xs=>{ const num=year+"-"+String(S.nextRecu++).padStart(4,"0"); xs.forEach(x=>x.recu=num); n++; }); close(); render(); return toast(n+" reçus annuels émis"); }
+  if(a==="payer"){ S.intentions.find(i=>i.id===el.dataset.id).paye=true; render(); return toast("Offrande marquée comme réglée"); }
+  if(a==="assign") return formAssign(el.dataset.c,el.dataset.r,+el.dataset.k);
+  if(a==="doAssign"){ S.planning[el.dataset.c][el.dataset.r][+el.dataset.k]=el.dataset.p; close(); render(); return toast(el.dataset.p+" est affecté(e) au service"); }
+  if(a==="rappel"){ const n=trous(); return toast(n?`Appel envoyé aux ${S.benevoles.length} bénévoles pour ${n} services (simulation)`:"Tous les services sont pourvus"); }
+  if(a==="inscrire"){ const ev=S.evenements.find(x=>x.id===el.dataset.id); if(ev.inscrits<ev.cap) ev.inscrits++; render(); return toast("Inscription ajoutée · "+ev.inscrits+"/"+ev.cap); }
+  if(a==="etape"){ const p=S.parcours.find(x=>x.id===el.dataset.id); p.etape++; if(p.etape===3&&!p.date) p.date=iso(d(30)); render(); return toast(p.titre+" : "+ETAPES[p.etape].toLowerCase()); }
+});
+document.addEventListener("submit", e=>{
+  e.preventDefault(); const id=e.target.id, v = k => document.getElementById(k).value.trim();
+  if(id==="fDon"){ const m=parseFloat(v("dMontant")); if(!(m>0)) return;
+    const fo=v("dFoyer")||null; S.dons.unshift({id:uid("d"),date:v("dDate"),foyer:fo,donateur:fo?null:"Don anonyme",anonyme:!fo,montant:m,fonds:v("dFonds"),mode:v("dMode"),origine:document.getElementById("dEtr").checked?"Étranger":"France",recu:null});
+    S.dons.sort((a,b)=>b.date.localeCompare(a.date)); close(); render(); toast("Don de "+eur(m,true)+" enregistré"); }
+  if(id==="fInt"){ S.intentions.push({id:uid("i"),messe:v("iMesse"),texte:v("iTexte"),demandeur:v("iDem"),offrande:+v("iOff")||0,paye:document.getElementById("iPaye").checked}); close(); location.hash="#intentions"; render(); toast("Intention enregistrée"); }
+  if(id==="fFoyer"){ const f={id:uid("f"),nom:v("fNom"),adresse:v("fAdr"),ville:v("fVille"),email:v("fMail"),tel:v("fTel"),depuis:year,membres:[{p:v("fMembre"),r:"Adulte",sac:"À compléter"}],note:""}; S.foyers.push(f); close(); render(); toast(f.nom+" ajouté"); }
+  if(id==="fEvt"){ S.evenements.push({id:uid("e"),titre:v("eTitre"),date:v("eDate"),heure:v("eHeure"),lieu:v("eLieu"),cap:+v("eCap")||1,inscrits:0,type:"Paroisse"}); S.evenements.sort((a,b)=>a.date.localeCompare(b.date)); close(); render(); toast("Événement créé"); }
+  if(id==="fPar"){ const t=v("pType"); S.parcours.push({id:uid("p"),titre:(t==="Obsèques"?"Obsèques de ":t+" de ")+v("pNom"),type:t,contact:v("pContact"),etape:0,date:null}); close(); render(); toast("Demande enregistrée"); }
+  if(id==="fReglages"){ Object.assign(S.reglages,{nom:v("rNom")||S.reglages.nom,statut:v("rStatut"),objectifDenier:+v("rObj")||0,offrande:+v("rOff")||0,seuilEtranger:+v("rSeuil")||0}); render(); toast("Paramètres enregistrés"); }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id==="qFoyers"){ UI.q=e.target.value; render(true); }
+  if(e.target.id==="qDons"){ UI.qDons=e.target.value; render(true); }
+});
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("#layer").innerHTML) close(); });
+window.addEventListener("hashchange", ()=>{ close(); render(); window.scrollTo(0,0); });
+
+window.__lantrne = {liturgie, enLettres, paques, avent1};
+render();
+})();
+</script>
+
+</body>
+</html>
